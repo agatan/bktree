@@ -2,6 +2,7 @@ package bktree
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
 
 	popcount "github.com/hideo55/go-popcount"
@@ -64,5 +65,158 @@ func TestFuzzyMatch(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func BenchmarkConstruct(b *testing.B) {
+	randoms := make([]uint64, 10000)
+	for i := range randoms {
+		randoms[i] = rand.Uint64()
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		var tree BKTree
+		for _, r := range randoms {
+			tree.Add(testEntry(r))
+		}
+	}
+}
+
+const largeSize int = 1000000
+const smallSize int = 1000
+
+func makeRandomTree(size int) *BKTree {
+	randoms := make([]int, size)
+	for i := range randoms {
+		randoms[i] = rand.Int()
+	}
+	var tree BKTree
+	for _, r := range randoms {
+		tree.Add(testEntry(r))
+	}
+	return &tree
+}
+
+func BenchmarkSearch_ExactForLargeTree(b *testing.B) {
+	tree := makeRandomTree(largeSize)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		tree.Search(testEntry(needle), 0)
+	}
+}
+
+func BenchmarkSearch_1FuzzyForLargeTree(b *testing.B) {
+	tree := makeRandomTree(largeSize)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		tree.Search(testEntry(needle), 1)
+	}
+}
+
+func BenchmarkSearch_2FuzzyForLargeTree(b *testing.B) {
+	tree := makeRandomTree(largeSize)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		tree.Search(testEntry(needle), 2)
+	}
+}
+
+func BenchmarkSearch_8FuzzyForLargeTree(b *testing.B) {
+	tree := makeRandomTree(largeSize)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		tree.Search(testEntry(needle), 8)
+	}
+}
+
+func BenchmarkSearch_32FuzzyForLargeTree(b *testing.B) {
+	tree := makeRandomTree(largeSize)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		tree.Search(testEntry(needle), 32)
+	}
+}
+
+func BenchmarkLinearSearchForLargeSet(b *testing.B) {
+	randoms := make([]uint64, largeSize)
+	for i := range randoms {
+		randoms[i] = rand.Uint64()
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		cnt := 0
+		for _, c := range randoms {
+			if int(popcount.Count(c^needle)) <= 1 {
+				cnt++
+			}
+		}
+	}
+}
+
+func BenchmarkSearch_ExactForSmallTree(b *testing.B) {
+	tree := makeRandomTree(smallSize)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		tree.Search(testEntry(needle), 0)
+	}
+}
+
+func BenchmarkSearch_1FuzzyForSmallTree(b *testing.B) {
+	tree := makeRandomTree(smallSize)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		tree.Search(testEntry(needle), 1)
+	}
+}
+
+func BenchmarkSearch_2FuzzyForSmallTree(b *testing.B) {
+	tree := makeRandomTree(smallSize)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		tree.Search(testEntry(needle), 2)
+	}
+}
+
+func BenchmarkSearch_8FuzzyForSmallTree(b *testing.B) {
+	tree := makeRandomTree(smallSize)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		tree.Search(testEntry(needle), 8)
+	}
+}
+
+func BenchmarkSearch_32FuzzyForSmallTree(b *testing.B) {
+	tree := makeRandomTree(smallSize)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		tree.Search(testEntry(needle), 32)
+	}
+}
+
+func BenchmarkLinearSearchForSmallSet(b *testing.B) {
+	randoms := make([]uint64, smallSize)
+	for i := range randoms {
+		randoms[i] = rand.Uint64()
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		needle := rand.Uint64()
+		cnt := 0
+		for _, c := range randoms {
+			if int(popcount.Count(c^needle)) <= 1 {
+				cnt++
+			}
+		}
 	}
 }
