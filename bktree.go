@@ -26,12 +26,13 @@ func (bk *BKTree) Add(entry Entry) {
 		d := nd.entry.Distance(entry)
 		if next, ok := nd.children[d]; ok {
 			nd = next
-			return
+			continue
 		}
 		nd.children[d] = &node{
 			entry:    entry,
 			children: make(map[int]*node),
 		}
+		return
 	}
 }
 

@@ -1,15 +1,21 @@
 package bktree
 
-import "testing"
+import (
+	"fmt"
+	"testing"
 
-type testEntry int
+	popcount "github.com/hideo55/go-popcount"
+)
 
-func (a testEntry) Distance(e Entry) int {
-	b := e.(testEntry)
-	if a > b {
-		return int(a) - int(b)
-	}
-	return int(b) - int(a)
+type testEntry uint64
+
+func (e testEntry) Distance(x Entry) int {
+	a := uint64(e)
+	b := uint64(x.(testEntry))
+
+	fmt.Printf("a = %b, b = %b, distance = %d\n", a, b, int(popcount.Count(a^b)))
+
+	return int(popcount.Count(a ^ b))
 }
 
 func TestEmptySearch(t *testing.T) {
@@ -27,16 +33,18 @@ func TestExactMatch(t *testing.T) {
 	}
 
 	for i := 0; i < 100; i++ {
-		results := tree.Search(testEntry(i), 0)
-		if len(results) != 1 {
-			t.Fatalf("exact match should return only one result, but got %d results (%#v)", len(results), results)
-		}
-		if results[0].Distance != 0 {
-			t.Fatalf("exact match result should have 0 as Distance field, but got %d", results[0].Distance)
-		}
-		if int(results[0].Entry.(testEntry)) != i {
-			t.Fatalf("expected result entry value is %d, but got %d", i, int(results[0].Entry.(testEntry)))
-		}
+		t.Run(fmt.Sprintf("searching %d", i), func(st *testing.T) {
+			results := tree.Search(testEntry(i), 0)
+			if len(results) != 1 {
+				st.Fatalf("exact match should return only one result, but got %d results (%#v)", len(results), results)
+			}
+			if results[0].Distance != 0 {
+				st.Fatalf("exact match result should have 0 as Distance field, but got %d", results[0].Distance)
+			}
+			if int(results[0].Entry.(testEntry)) != i {
+				st.Fatalf("expected result entry value is %d, but got %d", i, int(results[0].Entry.(testEntry)))
+			}
+		})
 	}
 }
 
@@ -47,14 +55,16 @@ func TestFuzzyMatch(t *testing.T) {
 	}
 
 	for i := 0; i < 100; i++ {
-		results := tree.Search(testEntry(i), 2)
-		for _, result := range results {
-			if result.Distance > 2 {
-				t.Fatalf("Distance fields of results should be less than or equal to 2, but got %d", result.Distance)
+		t.Run(fmt.Sprintf("searching %d", i), func(st *testing.T) {
+			results := tree.Search(testEntry(i), 2)
+			for _, result := range results {
+				if result.Distance > 2 {
+					st.Fatalf("Distance fields of results should be less than or equal to 2, but got %d", result.Distance)
+				}
+				if result.Entry.Distance(testEntry(i)) > 2 {
+					st.Fatalf("distances of result entries should be less than or equal to 2, but got %d", result.Distance)
+				}
 			}
-			if result.Entry.Distance(testEntry(i)) > 2 {
-				t.Fatalf("distances of result entries should be less than or equal to 2, but got %d", result.Distance)
-			}
-		}
+		})
 	}
 }
