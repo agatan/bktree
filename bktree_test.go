@@ -13,8 +13,6 @@ func (e testEntry) Distance(x Entry) int {
 	a := uint64(e)
 	b := uint64(x.(testEntry))
 
-	fmt.Printf("a = %b, b = %b, distance = %d\n", a, b, int(popcount.Count(a^b)))
-
 	return int(popcount.Count(a ^ b))
 }
 
