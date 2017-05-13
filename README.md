@@ -11,13 +11,14 @@ Data is 64 bits integer, and distance function is hamming distance.
 (see `bktree_test.go` for detail)
 
 ```
-BenchmarkSearch_ExactForLargeTree-4              1000000              1108 ns/op
-BenchmarkSearch_1FuzzyForLargeTree-4               50000             29468 ns/op
-BenchmarkSearch_2FuzzyForLargeTree-4                5000            328753 ns/op
-BenchmarkSearch_8FuzzyForLargeTree-4                  20          68182122 ns/op
-BenchmarkSearch_32FuzzyForLargeTree-4                  3         353715305 ns/op
+BenchmarkSearch_ExactForLargeTree-2         	 1000000	      3540 ns/op
+BenchmarkSearch_Tolerance1ForLargeTree-2    	   30000	     85227 ns/op
+BenchmarkSearch_Tolerance2ForLargeTree-2    	    3000	    907897 ns/op
+BenchmarkSearch_Tolerance4ForLargeTree-2    	     200	  17273811 ns/op
+BenchmarkSearch_Tolerance8ForLargeTree-2    	      10	 234244862 ns/op
+BenchmarkSearch_Tolerance32ForLargeTree-2   	       3	 722881937 ns/op
 
-BenchmarkLinearSearchForLargeSet-4                   300           4132926 ns/op
+BenchmarkLinearSearchForLargeSet-2          	      10	 281977270 ns/op
 ```
 
 If the tolerance is small enough, BK-tree is much faster than naive linear search.
