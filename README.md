@@ -1,4 +1,4 @@
-## bk-tree
+## bktree
 
 This is an implementation of [BK-tree](https://en.wikipedia.org/wiki/BK-tree) for golang.
 BK-tree is a tree data structure for similarity search in a metric space.
