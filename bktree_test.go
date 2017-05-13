@@ -68,8 +68,11 @@ func TestFuzzyMatch(t *testing.T) {
 	}
 }
 
+const largeSize int = 1000000
+const smallSize int = 1000
+
 func BenchmarkConstruct(b *testing.B) {
-	randoms := make([]uint64, 10000)
+	randoms := make([]uint64, largeSize)
 	for i := range randoms {
 		randoms[i] = rand.Uint64()
 	}
@@ -81,9 +84,6 @@ func BenchmarkConstruct(b *testing.B) {
 		}
 	}
 }
-
-const largeSize int = 1000000
-const smallSize int = 1000
 
 func makeRandomTree(size int) *BKTree {
 	randoms := make([]int, size)
